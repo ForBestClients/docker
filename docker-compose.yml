@@ -1,0 +1,86 @@
+version: '3'
+
+networks:
+  grandus:
+
+volumes: 
+  data:
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./logs/nginx/:/var/log/nginx
+    depends_on:
+      - php
+      - mariadb
+    networks:
+      - grandus
+  
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - grandus
+
+  php:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      args:
+        - PHP_VERSION=${PHP_VERSION}
+    container_name: php
+    volumes:
+      - ./src:/var/www
+    ports:
+      - "9000:9000"
+    networks: 
+      - grandus
+
+  elasticsearch:
+    image: elasticsearch:${ELASTIC_VERSION}
+    container_name: elasticsearch
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    expose:
+      - "9200"
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./docker/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./docker/elasticsearch/hunspell:/usr/share/elasticsearch/config/hunspell
+      - ./data/esdata:/usr/share/elasticsearch/data
+      - ./logs/elasticsearch:/usr/share/elasticsearch/logs
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+    networks: 
+      - grandus
+
+  kibana:
+    build:
+      context: .
+      dockerfile: ./docker/kibana/Dockerfile
+      args:
+        - KIBANA_VERSION=${KIBANA_VERSION}
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    networks: 
+      - grandus
