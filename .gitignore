@@ -1,4 +1,5 @@
 .env
 
-src/*
+src/app/*
+src/sync/*
 **/.DS_Store
