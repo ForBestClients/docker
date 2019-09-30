@@ -27,6 +27,7 @@ RUN docker-php-ext-install gd
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer global require "fxp/composer-asset-plugin:^1.1.3"
 
 # Add configuration files
 COPY ./docker/php/config/php.ini $PHP_INI_DIR/conf.d/
