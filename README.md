@@ -11,7 +11,7 @@ docker-compose version
 ```
 
 ## Setup
-1. Clone repository you want to work with to `./src` folder
+1. Clone repository you want to work with to `./src` folder. Use `./src/app` for grandus backend and `./src/sync` for synchornization
 2. Create `.env` file
 ```bash
 cp .env-example .env
@@ -33,18 +33,19 @@ bash -c "clear && docker exec -it php sh"
 ```
 
 ### Install Grandus dependencies
-After connecting to container you can run commands like in your ordinary terminal.
+After connecting to container you can run commands like composer and php yii to install dependencies and initalize grandus app.
 
 ### Grandus
 To access Grandus, open [http://0.0.0.0](http://0.0.0.0:80) in your browser. You can set different domain name by adding following to your `etc/hosts`
 
 ```bash
-0.0.0.0    grandus.docker
+0.0.0.0    app.grandus
+0.0.0.0    sync.grandus
 ```
 
 
 ## Settings
-All docker containers are within one virtual network and are accessible under following names:
+All docker containers are within one virtual network and are accessible with following names:
 
 |     Service   |      Host     | Port |
 |---------------|:-------------:|-----:|
